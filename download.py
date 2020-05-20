@@ -41,7 +41,7 @@ def init_printer():
     after[3] &= ~termios.ICANON & ~termios.ECHO
     termios.tcsetattr(fd, termios.TCSADRAIN, after)
 
-def print(*args, sep = " ", end = "\n", flush = False, display_status = True):
+def print(*args, sep = " ", end = "\033[K\n", flush = False, display_status = True):
     global t
     file = sys.stdout
     writestr = str(sep).join(str(arg) for arg in args) + end
@@ -92,7 +92,7 @@ def press_ctrl_right(input_text, pos):
 def input(*args, **kwargs):
     global t
     if not "end" in kwargs:
-        kwargs["end"] = "" # use different default value
+        kwargs["end"] = "\033[K" # use different default value
     if not "sep" in kwargs:
         kwargs["sep"] = " " # default value needed for this function
     kwargs["flush"] = True
@@ -187,7 +187,7 @@ def input(*args, **kwargs):
                         t["input"] = input_start + input_text
                         t["inputpos"] = pos + len(input_start)
                 else:
-                    print(suggestion)
+                    print("[ " + " | ".join(suggestion) + " ]")
             elif key == "\n":
                 with t["outputlock"]:
                     sys.stdout.write(key)
@@ -205,7 +205,7 @@ def input(*args, **kwargs):
         input_text = ""
         return result
 
-def status(*args, sep = " ", end = "\n", flush = False):
+def status(*args, sep = " ", end = "\033[K\n", flush = False):
     file = sys.stdout
     writestr = str(sep).join(str(arg) for arg in args) + end
     print(writestr, end="", flush = flush, display_status = False)
